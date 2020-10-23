@@ -20,6 +20,7 @@ parameter "param_allowed_regions" do
   type "list"
   label "Allowed Regions"
   allowed_pattern /^([a-zA-Z-_]+-[a-zA-Z0-9-_]+-[0-9-_]+,*|)+$/
+  min_length 5
   description "A list of allowed regions"
 end
 
