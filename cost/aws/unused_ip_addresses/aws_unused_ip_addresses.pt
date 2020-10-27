@@ -210,23 +210,32 @@ end
 # Scripts
 ###############################################################################
 
-script  "js_regions", type:"javascript" do
+script "js_regions", type:"javascript" do
   parameters "user_entered_regions", "all_regions"
   result "regions"
   code <<-EOS
-    var uniqueRegions = user_entered_regions.filter(function(item, pos){
-      return user_entered_regions.indexOf(item) == pos; 
-    });
+    //Throw an error if regions list is empty
+    if(_.isEmpty(user_entered_regions)){
+      throw "Regions list can't be empty, So please enter regions'"
+    }
+
+    //Filter unique regions
+    var uniqueRegions = _.uniq(user_entered_regions);
+    console.log("Unique Regions "+uniqueRegions)
     var all_regions_list = [];
     all_regions.forEach(function(all_region){
       all_regions_list.push(all_region.region)
     })
+
+    //Filter valid regions
     var valid_regions = [];
-    uniqueRegions.forEach(function(uniqueRegion){
-      if (all_regions_list.indexOf(uniqueRegion) > -1) {
+    _.map(uniqueRegions, function(uniqueRegion){
+      if(all_regions_list.indexOf(uniqueRegion) > -1){
         valid_regions.push({"region": uniqueRegion})
       }
     })
+
+    //Throw an error if no valid regions found
     if (_.isEmpty(valid_regions)) {
       throw "Please enter valid regions"
     }else{
