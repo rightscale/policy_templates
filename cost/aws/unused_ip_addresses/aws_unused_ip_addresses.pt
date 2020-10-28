@@ -19,7 +19,7 @@ info(
 parameter "param_allowed_regions" do
   type "list"
   label "Allowed Regions"
-  allowed_pattern /^([a-zA-Z-_]+-[a-zA-Z0-9-_]+-[0-9-_]+,*|)+$/
+  allowed_pattern /^([a-zA-Z-_]+-[a-zA-Z-_]+-[0-9-_]+,*|)+$/
   description "A list of allowed regions"
 end
 
@@ -221,7 +221,6 @@ script "js_regions", type:"javascript" do
 
     //Filter unique regions
     var uniqueRegions = _.uniq(user_entered_regions);
-    console.log("Unique Regions "+uniqueRegions)
     var all_regions_list = [];
     all_regions.forEach(function(all_region){
       all_regions_list.push(all_region.region)
