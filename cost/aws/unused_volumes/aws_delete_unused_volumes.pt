@@ -18,8 +18,11 @@ info(
 parameter "param_allowed_regions" do
   type "list"
   label "Allowed Regions"
+  min_length 1
+  default ["us-east-1","us-east-2","us-west-1","us-west-2","af-south-1","ap-east-1","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1",
+              "eu-central-1","eu-west-1","eu-west-2","eu-south-1","eu-west-3","eu-north-1","me-south-1","sa-east-1"]
   allowed_pattern /^([a-zA-Z-_]+-[a-zA-Z0-9-_]+-[0-9-_]+,*|)+$/
-  description "A list of allowed regions"
+  description "A list of allowed regions. See [README](https://github.com/rightscale/policy_templates/tree/master/cost/scheduled_reports_with_estimates) for more details"
 end
 
 parameter "param_email" do
@@ -271,7 +274,7 @@ script "js_regions", type:"javascript" do
   code <<-EOS
     //Throw an error if regions list is empty
     if(_.isEmpty(user_entered_regions)){
-      throw "Regions list can't be empty, So please enter regions'"
+      throw "Regions list can't be empty, So please enter the regions and try again !!!"
     }
 
     //Filter unique regions
@@ -291,7 +294,7 @@ script "js_regions", type:"javascript" do
 
     //Throw an error if no valid regions found
     if (_.isEmpty(valid_regions)) {
-      throw "Please enter valid regions"
+      throw "Please enter the valid regions and try again !!!"
     }else{
       regions = valid_regions
     }    

@@ -18,6 +18,7 @@ If the user is not having the minimum required role of `billing_center_viewer` o
 
 This policy has the following input parameters required when launching the policy.
 
+- *Allowed Regions* - A list of allowed regions. Check the [available regions](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-regions) in AWS  
 - *Unused days* - The number of days a volume has been unused. The days should be greater than zero.
 - *Email addresses* - A list of email addresses to notify
 - *Exclude Tags.* - A list of tags used to excluded volumes from the incident.
