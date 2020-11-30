@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.22
+
+- Scoped available BCs to user permission.
+
 ## v1.21
 
 - Added "Billing Centers" as a reportable dimension
