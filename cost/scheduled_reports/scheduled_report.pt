@@ -20,7 +20,7 @@ category "Cost"
 default_frequency "monthly"
 tenancy "single"
 info(
-  version: "1.21",
+  version: "1.22",
   provider: "Flexera Optima",
   service: "",
   policy_set: ""
@@ -115,12 +115,6 @@ datasource "ds_user_billing_centers" do
   request do
     run_script $js_get_billing_centers, $ds_session,rs_org_id,rs_optima_host
   end
-  # result do
-  #   encoding "json"
-  #   collect jmes_path(response,"result[*]") do
-  #     field "id", val(iter_item,"id")
-  #   end
-  # end
 end
 
 datasource "ds_billing_centers" do
