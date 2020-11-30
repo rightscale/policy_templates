@@ -96,27 +96,6 @@ datasource "ds_currency_code" do
   end
 end
 
-datasource "ds_billing_centers" do
-  request do
-    auth $auth_rs
-    host rs_optima_host
-    path join(["/analytics/orgs/",rs_org_id,"/billing_centers"])
-    header "Api-Version", "1.0"
-    header "User-Agent", "RS Policies"
-    query "view", "allocation_table"
-  end
-  result do
-    encoding "json"
-    collect jmes_path(response,"[*]") do
-      field "href", jmes_path(col_item,"href")
-      field "id", jmes_path(col_item,"id")
-      field "name", jmes_path(col_item,"name")
-      field "parent_id", jmes_path(col_item,"parent_id")
-      field "ancestor_ids", jmes_path(col_item,"ancestor_ids")
-      field "allocation_table", jmes_path(col_item,"allocation_table")
-    end
-  end
-end
 
 datasource "ds_session" do
   request do
@@ -132,8 +111,34 @@ datasource "ds_session" do
   end
 end
 
+datasource "ds_user_billing_centers" do
+  request do
+    run_script $js_get_billing_centers, $ds_session,rs_org_id,rs_optima_host
+  end
+  # result do
+  #   encoding "json"
+  #   collect jmes_path(response,"result[*]") do
+  #     field "id", val(iter_item,"id")
+  #   end
+  # end
+end
+
 datasource "ds_billing_centers" do
-  run_script $js_get_billing_centers, $ds_session,rs_org_id,rs_optima_host
+  iterate $ds_user_billing_centers
+  request do
+    run_script $js_ds_billing_centers,rs_org_id,rs_optima_host, val(iter_item,"id")
+  end
+ result do
+   encoding "json"
+    collect jmes_path(response,"[*]") do
+     field "href", jmes_path(iter_item,"href")
+     field "id", jmes_path(iter_item,"id")
+     field "name", jmes_path(iter_item,"name")
+     field "parent_id", jmes_path(col_item,"parent_id")
+     field "ancestor_ids", jmes_path(col_item,"ancestor_ids")
+     field "allocation_table", jmes_path(col_item,"allocation_table")
+    end
+ end
 end
 
 script "js_get_billing_centers", type: "javascript" do
@@ -143,36 +148,27 @@ script "js_get_billing_centers", type: "javascript" do
     request = {
       "auth": "auth_rs",
       "verb": "GET",
-      "host": rs_optima_host
-      "path": "/analytics/users/"+ds_session["user_id"]+"/orgs/"+rs_org_id+"/billing_centers"
-      "headers": {"Api-Version": "1.0" },
-      "query_params":{"view":"allocation_table"}
+      "host": rs_optima_host,
+      "path": "/analytics/users/"+ds_session["user_id"]+"/orgs/"+rs_org_id+"/billing_centers",
+      "headers": {"Api-Version": "1.0" }
     }
   EOS
 end
 
-# datasource "ds_billing_centers_new" do
-#   iterate $ds_session
-#   request do
-#     auth $auth_rs
-#     host rs_optima_host
-#     path join(["/analytics/users/",val(iter_item,"user_id"),"/orgs/",rs_org_id,"/billing_centers"])
-#     header "Api-Version", "1.0"
-#     header "User-Agent", "RS Policies"
-#     query "view", "allocation_table"
-#   end
-#   result do
-#     encoding "json"
-#     collect jmes_path(response,"[*]") do
-#       field "href", jmes_path(col_item,"href")
-#       field "id", jmes_path(col_item,"id")
-#       field "name", jmes_path(col_item,"name")
-#       field "parent_id", jmes_path(col_item,"parent_id")
-#       field "ancestor_ids", jmes_path(col_item,"ancestor_ids")
-#       field "allocation_table", jmes_path(col_item,"allocation_table")
-#     end
-#   end
-# end
+
+script "js_ds_billing_centers", type: "javascript" do
+  parameters "rs_org_id","rs_optima_host","billing_center_id"
+  result "results"
+  code <<-EOS
+    results = {
+      "auth": "auth_rs",
+      "verb": "GET",
+      "host": rs_optima_host,
+      "path": "/analytics/orgs/"+rs_org_id+"/billing_centers/"+billing_center_id,
+      "headers": {"Api-Version": "1.0" }
+	}
+  EOS
+end
 
 datasource "ds_current_week_costs" do
   request do
@@ -184,6 +180,7 @@ script "js_current_week_cost_request", type: "javascript" do
   parameters "param_billing_centers", "param_cost_metric", "rs_org_id", "rs_optima_host", "ds_billing_centers", "param_graph_dimension"
   result "request"
   code <<-EOS
+  console.log(param_billing_centers);
     var range = "daily";
     var scale = "current";
     // format the date for the `daily` API
