@@ -146,7 +146,7 @@ end
 script "js_new_costs_request", type: "javascript" do
   parameters "org_id","ds_billing_centers", "param_billing_centers"
   result "request"
-  code <<-EOS  
+  code <<-EOS
     var date = new Date();
     var year = date.getUTCFullYear();
 	var month =  (date.getUTCMonth()==11)?1:2 + date.getUTCMonth();
@@ -416,7 +416,7 @@ policy "pol_aws_superseded_instance" do
     check logic_or(lt(to_n(val(item,"run_rate")),$param_threshold), lt(to_n(val(item,"run_rate")),$param_minimum_savings_threshold))
     escalate $report_instances
     export do
-      # no actions so resource_level can be false				       
+      # no actions so resource_level can be false
       resource_level false
       field "region" do
         label "Region"
@@ -440,9 +440,9 @@ policy "pol_aws_superseded_instance" do
         label "ENA Required"
       end
       field "run_rate" do
-        label "ENA Required"
+        label "Run Rate"
       end
-    end 
+    end
   end
 end
 
