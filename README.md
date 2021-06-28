@@ -149,6 +149,8 @@ Please contact sales@flexera.com to learn more.
 
 #### Azure
 
+- [Azure Resources with public IP address](./security/azure/resources_with_public_ip_address)
+
 ##### Database
 
 - [Azure Publicly Accessible Managed SQL Instance](./security/azure/sql_publicly_accessible_managed_instance/)
